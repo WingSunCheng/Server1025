@@ -32,6 +32,7 @@ public class Server {
     }
 
 
+
     /**
      * Cette méthode permet d'ajouter une instance de EventHandler(interface fonctionnelle) dans ArrayList<EventHandler>
      * handlers.
@@ -130,6 +131,16 @@ public class Server {
         objectInputStream.close();
         client.close();
     }
+
+    public void handleEvents(String cmd, String arg) {
+        if (cmd.equals(REGISTER_COMMAND)) {
+            handleRegistration();
+        } else if (cmd.equals(LOAD_COMMAND)) {
+            handleLoadCourses(arg);
+        }
+    }
+
+
     /**
      Lire un fichier texte contenant des informations sur les cours et les transofmer en liste d'objets 'Course'.
      La méthode filtre les cours par la session spécifiée en argument.
