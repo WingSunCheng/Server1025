@@ -130,43 +130,70 @@ public class Server {
         objectInputStream.close();
         client.close();
     }
-
-
-    /**
-     * Cette méthode permet de traiter la commande reçue, si la commande égale à "REGISTER_COMMAND", la méthode
-     * handleRegistration() va être appelée pour que les étudiants puissent s'inscrire aux cours. Si la commande
-     * égale à "LOAD_COMMAND", la méthode handleLoadCourses(arg) va être applée pour que les étudiants puissent avoir
-     * accès aux listes de cours.
-     *
-     * @param cmd la commande qui va être traitée
-     * @param arg l'argument
-     */
-    public void handleEvents(String cmd, String arg) {
-        if (cmd.equals(REGISTER_COMMAND)) {
-            handleRegistration();
-        } else if (cmd.equals(LOAD_COMMAND)) {
-            handleLoadCourses(arg);
-        }
-    }
-
     /**
      Lire un fichier texte contenant des informations sur les cours et les transofmer en liste d'objets 'Course'.
      La méthode filtre les cours par la session spécifiée en argument.
      Ensuite, elle renvoie la liste des cours pour une session au client en utilisant l'objet 'objectOutputStream'.
      La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux.
-     @param arg la session pour laquelle on veut récupérer la liste des cours.
+     @param arg la session pour laquelle on veut récupérer la liste des cours
      */
     public void handleLoadCourses(String arg) {
         // TODO: implémenter cette méthode
 
-    }
-        /**
-         Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans un fichier texte
-         et renvoyer un message de confirmation au client.
-         La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
-         */
-        public void handleRegistration () {
+        ArrayList<Course> courses = new ArrayList<>();
 
-            // TODO: implémenter cette méthode
+        try{
+            Scanner scan = new Scanner(new File("cours.txt"));
+
+            while (scan.hasNextLine()){
+                String a = scan.nextLine();
+                String[] b = a.split("\t");
+                String code = b[0];
+                String name = b[1];
+                String session = b[2];
+
+                Course testing = new Course(name,code,session);
+
+                if (testing.getSession().equals(arg)){
+                    courses.add(testing);
+                }
+            }
+            scan.close();
+            System.out.println(courses);
+
+            objectOutputStream.writeObject(courses);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+
+        }catch (FileNotFoundException e){
+            System.out.println("Erreur à l'ouverture du fichier");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
+
+    /**
+     Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans un fichier texte
+     et renvoyer un message de confirmation au client.
+     La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
+     */
+    public void handleRegistration() {
+        try {
+            client = server.accept();
+            System.out.println("ALLO??");
+
+            String filePath = "src/main/java/server/data/inscription.txt";
+            ObjectInputStream input = new ObjectInputStream(client.getInputStream());
+            RegistrationForm form = (RegistrationForm) input.readObject();
+            Writer writer = new FileWriter(filePath);
+            writer.write(form.getCourse().getSession() + "\t" + form.getCourse().getCode() + "\t" + form.getMatricule() + "\t" + form.getNom() + "\t" + form.getPrenom() + "\t" + form.getEmail());
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // TODO: implémenter cette méthode
+    }
+}
