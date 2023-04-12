@@ -191,9 +191,7 @@ public class Server {
     public void handleRegistration() {
         try {
             client = server.accept();
-            System.out.println("ALLO??");
-
-            String filePath = "src/main/java/server/data/inscription.txt";
+            String filePath = "inscription.txt";
             ObjectInputStream input = new ObjectInputStream(client.getInputStream());
             RegistrationForm form = (RegistrationForm) input.readObject();
             Writer writer = new FileWriter(filePath);
