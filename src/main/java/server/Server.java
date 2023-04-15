@@ -194,8 +194,8 @@ public class Server {
             String filePath = "inscription.txt";
             ObjectInputStream input = new ObjectInputStream(client.getInputStream());
             RegistrationForm form = (RegistrationForm) input.readObject();
-            Writer writer = new FileWriter(filePath);
-            writer.write(form.getCourse().getSession() + "\t" + form.getCourse().getCode() + "\t" + form.getMatricule() + "\t" + form.getNom() + "\t" + form.getPrenom() + "\t" + form.getEmail());
+            Writer writer = new FileWriter(filePath, true);
+            writer.write(form.getCourse().getSession() + "\t" + form.getCourse().getCode() + "\t" + form.getMatricule() + "\t" + form.getNom() + "\t" + form.getPrenom() + "\t" + form.getEmail() + "\n");
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
